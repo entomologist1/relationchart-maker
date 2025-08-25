@@ -1,0 +1,11 @@
+.target {
+    border: 2px solid blue;
+    background-color: #d2e9ff;
+    cursor: pointer;
+  }
+
+.selected {
+    border: 2px solid rgb(255, 0, 208);
+    background-color: #ffd2e2;
+    cursor: pointer;
+  }
