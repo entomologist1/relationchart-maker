@@ -273,7 +273,7 @@ function updateEditRelation() {
   function handleSubmit() {
     const fromTrueId = targetDiv ? targetDiv.dataset.trueId : null;
     const toTrueId = selectedDiv ? selectedDiv.dataset.trueId : null;
-    const content = relationInput.value.trim();
+    const content = relationInput.value;
 
     if (fromTrueId === null || toTrueId === null || content === "") return; //Then dont even bother lol
 
@@ -317,6 +317,8 @@ function updateEditRelation() {
 
 function refreshRelationsList() {
   relationsListDiv.innerHTML = ""; // clear old list
+  relationsListDiv.style.maxHeight = "100px";
+  relationsListDiv.style.overflowY = "scroll";
 
   submittedRelations.forEach((rel) => {
     const fromEntry = submittedlist.querySelector(
@@ -414,7 +416,7 @@ function exportToHTML() {
 
   //this is taken from htmlexportscript.js
 
-  const baseCircleSize = 400;
+  const baseCircleSize = 300;
   let baseIconSize = 100;
   let minIconSize = 40;
   let iconSize = Math.max(
@@ -474,6 +476,13 @@ function exportToHTML() {
       <div class="card-body">
         ${generateCircleHTML()} <!-- outer circle -->
       </div>
+
+      <div style="text-align: center">
+        <a class="icon-link" href="https://toyhou.se/34862608.responsive-relation-chartf2u" target="_blank">
+          <i class="fas fa-brackets"></i>
+        </a>
+        </div>
+
     </div>
   </div>
 `;
@@ -517,7 +526,7 @@ function exportToHTML() {
 
         html += `
       <div id="inner${outerId}_${innerId}" class="collapse fade" data-parent="#allclosed${outerId}" style="margin-top:10px;">
-        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding-top:20px; padding-bottom:20px; border-radius:10px">
+        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow:auto; overflow-wrap: break-word;">
           <h6><strong>${outerName}</strong> → <strong>${innerName}</strong></h6>
           <p>${escapeHTML(relationContent)}</p>
         </div>
@@ -568,7 +577,8 @@ function escapeHTML(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/'/g, "&#39;")
+    .replace(/\n/g, "<br>");
 }
 
 
