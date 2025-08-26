@@ -430,7 +430,6 @@ function exportToHTML() {
   function generateCircleHTML(disableIndices = [], hrefPrefix = "allclosed") {
     let html = `
     <div style="position:relative; width:${circleSize}px; height:${circleSize}px; margin:auto;">
-      <!-- dashed background circle -->
       <div style="
         position:absolute;
         top:50%;
@@ -440,7 +439,6 @@ function exportToHTML() {
         border:2px dashed #999;
         border-radius:50%;
         transform:translate(-50%, -50%);
-        pointer-events:none;
       "></div>
   `;
 
@@ -521,7 +519,7 @@ function exportToHTML() {
       <div id="inner${outerId}_${innerId}" class="collapse fade" data-parent="#allclosed${outerId}" style="margin-top:10px;">
         <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding-top:20px; padding-bottom:20px; border-radius:10px">
           <h6><strong>${outerName}</strong> → <strong>${innerName}</strong></h6>
-          <p>${relationContent}</p>
+          <p>${escapeHTML(relationContent)}</p>
         </div>
       </div>
       `;
@@ -562,3 +560,15 @@ function copyHTML() {
       console.error(":(");
     });
 }
+
+
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+
