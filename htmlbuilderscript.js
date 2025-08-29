@@ -396,6 +396,11 @@ function prepareToHTML() {
 
 function exportToHTML() {
   const preparedData = prepareToHTML();
+
+  if (!preparedData) {
+    return;
+  }
+
   const nameList = preparedData.nameList;
   const imgSrcList = preparedData.imageList;
   const urlList = preparedData.urlList;
@@ -470,7 +475,7 @@ function exportToHTML() {
 
   // Outer accordion
   let html = `
-<div id="outerAccordion">
+<div id="outerAccordion" style="overflow:scroll;">
   <div>
     <div id="circleCollapse" class="collapse fade show" data-parent="#outerAccordion" style="margin:auto;">
       <div class="card-body">
@@ -549,6 +554,170 @@ function exportToHTML() {
   document.getElementById("exportBox").textContent = html;
 }
 
+function exportToHTMLSingle() {
+  const targetDiv = document.querySelector("#submittedListDiv .target");
+
+  const preparedData = prepareToHTML();
+
+  
+  if (!preparedData) {
+    return;
+  }
+  
+  const nameList = preparedData.nameList;
+  const imgSrcList = preparedData.imageList;
+  const urlList = preparedData.urlList;
+  const trueIDsList = preparedData.trueIDsList;
+  let outer = -1;
+
+  if (targetDiv) {
+    const targetTrueId = targetDiv.dataset.trueId;
+    const trueIdArray = Object.keys(trueIDsList).map((key, i) => {
+      return targetDiv.parentElement.querySelectorAll(".entry")[i].dataset
+        .trueId;
+    });
+    outer = trueIdArray.indexOf(targetTrueId);
+  }
+
+  const numItems = nameList.length;
+
+  const preparedRelationsList = {};
+  Object.keys(trueIDsList).forEach((key, i) => {
+    preparedRelationsList[`list${i + 1}`] = trueIDsList[key];
+  });
+
+  //this is taken from htmlexportscript.js
+  //im lazy
+
+  const baseCircleSize = 300;
+  let baseIconSize = 100;
+  let minIconSize = 40;
+  let iconSize = Math.max(
+    minIconSize,
+    baseIconSize - Math.max(0, numItems - 8) * 2
+  );
+  let circumference = iconSize * numItems * 1.1;
+  let requiredRadius = circumference / (2 * Math.PI);
+  let circleSize = Math.max(baseCircleSize, requiredRadius * 2 + iconSize + 40);
+  let radius = circleSize / 2 - iconSize / 2 - 10;
+
+  //my circle #Mycircle
+  function generateCircleHTML(disableIndices = [], hrefPrefix = "allclosed") {
+    let html = `
+    <div style="position:relative; width:${circleSize}px; height:${circleSize}px; margin:auto;">
+      <div style="
+        position:absolute;
+        top:50%;
+        left:50%;
+        width:${radius * 2}px;
+        height:${radius * 2}px;
+        border:2px dashed #999;
+        border-radius:50%;
+        transform:translate(-50%, -50%);
+      "></div>
+  `;
+
+    for (let i = 0; i < numItems; i++) {
+      const angle = (360 / numItems) * i;
+      const isDisabled = disableIndices.includes(i);
+      const href = isDisabled
+        ? "javascript:void(0);"
+        : `#${hrefPrefix}${i + 1}`;
+      const imgSrc = imgSrcList[i % imgSrcList.length];
+
+      html += `
+      <div style="position:absolute; top:50%; left:50%; transform:rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg) translate(-50%, -50%);">
+        <a ${isDisabled ? "" : `data-toggle="collapse"`} href="${href}">
+          <img src="${imgSrc}" alt="Toggle ${i + 1}" 
+               style="width:${iconSize}px; height:${iconSize}px; object-fit:cover; border-radius:8px; ${
+        isDisabled ? "opacity:0.2;" : "animation: fa-fade 1s;"
+      }">
+        </a>
+      </div>
+    `;
+    }
+
+    html += `</div>`;
+    return html;
+  }
+
+  // Outer accordion
+  //ill be real this is rlly lazy  i totally could remove this and fix it up but. bwehhhh :p
+  let html = `
+<div id="outerAccordion">
+`;
+
+  if (outer != -1) {
+    const outerId = outer + 1;
+    const outerName = nameList[outer];
+    const outerUrl = urlList[outer];
+    const relKey = `list${outerId}`;
+    const relationRow = preparedRelationsList[relKey];
+
+    // determine which inner indices should be disabled (the null relations and self)
+    let disabled = [];
+    for (let inner = 0; inner < numItems; inner++) {
+      if (inner === outer || relationRow[inner] === null) {
+        disabled.push(inner);
+      }
+    }
+
+    html += `
+<div id="allclosed${outerId}" class="collapse fade show" data-parent="#outerAccordion">
+  <div class="card" style="margin:auto; max-width:700px; margin-top:20px; border-radius:10px;">
+    <div class="card-body" style="padding-top:40px;padding-bottom:40px;">
+      ${generateCircleHTML(disabled, `inner${outerId}_`)}
+      <div style="margin-top:20px; text-align:center;">
+        <h5>
+          <a href="${outerUrl}" target="_blank" style="text-decoration:none;">
+            <strong>${outerName}</strong>
+          </a>
+        </h5>
+      </div>
+`;
+
+    // build only existing relations
+    for (let inner = 0; inner < numItems; inner++) {
+      if (inner !== outer && relationRow[inner] !== null) {
+        const innerId = inner + 1;
+        const innerName = nameList[inner];
+        const relationContent = relationRow[inner];
+
+        html += `
+      <div id="inner${outerId}_${innerId}" class="collapse fade" data-parent="#allclosed${outerId}" style="margin-top:10px;">
+        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow:auto; overflow-wrap: break-word;">
+          <h6><strong>${outerName}</strong> → <strong>${innerName}</strong></h6>
+          <p>${escapeHTML(relationContent)}</p>
+        </div>
+      </div>
+      `;
+      }
+    }
+
+    html += `
+      </div>
+    </div>
+
+    <div style="text-align: center">
+        <a class="icon-link" href="https://toyhou.se/34862608.responsive-relation-chartf2u" target="_blank">
+          <i class="fas fa-brackets"></i>
+        </a>
+        </div>
+
+  </div>
+  `;
+  } else {
+    alert(" select a target character to export");
+    return;
+  }
+
+  html += `</div>`;
+
+  // ready to output
+  document.getElementById("outerAccordion").innerHTML = html;
+  document.getElementById("exportBox").textContent = html;
+}
+
 function copyHTML() {
   const exportBox = document.getElementById("exportBox");
   const text = exportBox.textContent;
@@ -570,7 +739,6 @@ function copyHTML() {
     });
 }
 
-
 function escapeHTML(str) {
   return str
     .replace(/&/g, "&amp;")
@@ -578,7 +746,6 @@ function escapeHTML(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
-    .replace(/\n/g, "<br>");
+    .replace(/\n/g, "<br>")
+    .replace(/ /g, "&nbsp;");
 }
-
-
