@@ -644,7 +644,7 @@ function exportToHTMLSingle() {
   // Outer accordion
   //ill be real this is rlly lazy  i totally could remove this and fix it up but. bwehhhh :p
   let html = `
-<div id="outerAccordion">
+<div id="outerAccordion" style="overflow:scroll;">
 `;
 
   if (outer != -1) {
@@ -749,3 +749,4 @@ function escapeHTML(str) {
     .replace(/\n/g, "<br>")
     .replace(/ /g, "&nbsp;");
 }
+
