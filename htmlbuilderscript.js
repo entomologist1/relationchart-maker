@@ -421,7 +421,7 @@ function exportToHTML() {
 
   //this is taken from htmlexportscript.js
 
-  const baseCircleSize = 300;
+  const baseCircleSize = 400;
   let baseIconSize = 100;
   let minIconSize = 40;
   let iconSize = Math.max(
@@ -475,7 +475,7 @@ function exportToHTML() {
 
   // Outer accordion
   let html = `
-<div id="outerAccordion" style="overflow:scroll;">
+<div id="outerAccordion" style="overflow: scroll">
   <div>
     <div id="circleCollapse" class="collapse fade show" data-parent="#outerAccordion" style="margin:auto;">
       <div class="card-body">
@@ -531,7 +531,7 @@ function exportToHTML() {
 
         html += `
       <div id="inner${outerId}_${innerId}" class="collapse fade" data-parent="#allclosed${outerId}" style="margin-top:10px;">
-        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow:auto; overflow-wrap: break-word;">
+        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow-wrap:break-word; word-break:break-word; white-space:normal;">
           <h6><strong>${outerName}</strong> → <strong>${innerName}</strong></h6>
           <p>${escapeHTML(relationContent)}</p>
         </div>
@@ -589,7 +589,7 @@ function exportToHTMLSingle() {
   //this is taken from htmlexportscript.js
   //im lazy
 
-  const baseCircleSize = 300;
+  const baseCircleSize = 400;
   let baseIconSize = 100;
   let minIconSize = 40;
   let iconSize = Math.max(
@@ -644,7 +644,7 @@ function exportToHTMLSingle() {
   // Outer accordion
   //ill be real this is rlly lazy  i totally could remove this and fix it up but. bwehhhh :p
   let html = `
-<div id="outerAccordion" style="overflow:scroll;">
+<div id="outerAccordion" style="overflow: scroll">
 `;
 
   if (outer != -1) {
@@ -685,7 +685,7 @@ function exportToHTMLSingle() {
 
         html += `
       <div id="inner${outerId}_${innerId}" class="collapse fade" data-parent="#allclosed${outerId}" style="margin-top:10px;">
-        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow:auto; overflow-wrap: break-word;">
+        <div class="card card-body" style="margin:auto;text-align:center; max-width:600px; padding:20px; border-radius:10px; overflow-wrap:break-word; word-break:break-word; white-space:normal;">
           <h6><strong>${outerName}</strong> → <strong>${innerName}</strong></h6>
           <p>${escapeHTML(relationContent)}</p>
         </div>
@@ -707,7 +707,7 @@ function exportToHTMLSingle() {
   </div>
   `;
   } else {
-    alert(" select a target character to export");
+    alert(" select a origin character to export");
     return;
   }
 
@@ -746,7 +746,5 @@ function escapeHTML(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
-    .replace(/\n/g, "<br>")
-    .replace(/ /g, "&nbsp;");
+    .replace(/\n/g, "<br>");
 }
-
